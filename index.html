@@ -6,61 +6,96 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { font-family: Arial, sans-serif; background:#0b1220; color:#e9eefc; padding:40px; margin:0; }
-    a { color:#9ec5fe; font-size:18px; text-decoration:none; }
-    a:hover { text-decoration:underline; }
-    .wrap { max-width: 720px; margin: 0 auto; }
+    .wrap { max-width: 780px; margin: 0 auto; }
     .box { background:#121a2b; padding:20px; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
-    .row { display:flex; gap:16px; flex-wrap:wrap; }
-    .card { flex:1; min-width:220px; background:rgba(255,255,255,.04); padding:16px; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
     .muted { color:rgba(233,238,252,.75); font-size:14px; }
     .pill { display:inline-block; padding:.2rem .55rem; border:1px solid rgba(255,255,255,.14); border-radius:999px; font-size:12px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
-    ul { margin:10px 0 0 0; padding-left:18px; }
+    .row { display:flex; gap:14px; flex-wrap:wrap; margin-top:14px; }
+    .card { flex:1; min-width:260px; background:rgba(255,255,255,.04); padding:16px; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
+    label { display:block; margin-bottom:6px; }
+    select, input[type="date"] { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:#0e1626; color:#e9eefc; }
+    button { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:#1b4fd6; color:#fff; cursor:pointer; }
+    button.secondary { background:#24314a; }
+    button:hover { filter: brightness(1.05); }
+    .top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="box">
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+      <div class="top">
         <div>
           <h2 style="margin:0;">Store Reports</h2>
-          <div class="muted">Daily Summary • Category Report • Onhand</div>
+          <div class="muted">Daily Summary • Category Report</div>
         </div>
-        <div class="pill mono" id="updated">updated: —</div>
+        <div class="pill mono" id="updated">latest: —</div>
       </div>
 
-      <div class="row" style="margin-top:16px;">
+      <div class="row">
         <div class="card">
-          <div class="pill">Daily</div>
-          <ul>
-            <li><a href="summary_daily.html" target="_blank">Summary Report Daily</a></li>
-            <li><a href="category_report.html" target="_blank">Category Report</a></li>
-            <li><a href="onhand.html" target="_blank">Onhand Report</a></li>
-          </ul>
+          <div class="pill">Select Date</div>
+          <div style="margin-top:10px;">
+            <label class="muted">Available dates</label>
+            <select id="dateSelect"></select>
+            <div class="muted" style="margin-top:8px;">
+              If no dates show up, upload <span class="mono">report_index.json</span> + at least one report folder.
+            </div>
+          </div>
         </div>
 
         <div class="card">
-          <div class="pill">Notes</div>
-          <div class="muted" style="margin-top:10px;">
-            Files are overwritten daily by the store sync agent.
+          <div class="pill">Open Report</div>
+          <div style="margin-top:10px; display:grid; gap:10px;">
+            <button onclick="openReport('summary_daily.html')">Open Daily Summary</button>
+            <button class="secondary" onclick="openReport('category_report.html')">Open Category Report</button>
           </div>
           <div class="muted" style="margin-top:10px;">
-            If a report link 404s, it hasn’t been published yet.
+            Path format:
+            <span class="mono">reports/YYYY-MM-DD/</span>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <script>
-    // Optional: if you later add a latest.json file, this will show the last updated time.
-    fetch("latest.json", {cache: "no-store"})
-      .then(r => r.ok ? r.json() : null)
-      .then(j => {
-        if (!j) return;
-        document.getElementById("updated").textContent = "updated: " + (j.updated_at || "—");
-      })
-      .catch(()=>{});
-  </script>
+<script>
+  const dateSelect = document.getElementById("dateSelect");
+  const updated = document.getElementById("updated");
+
+  function setDates(dates, latest) {
+    dateSelect.innerHTML = "";
+    dates.forEach(d => {
+      const opt = document.createElement("option");
+      opt.value = d;
+      opt.textContent = d;
+      dateSelect.appendChild(opt);
+    });
+    if (latest && dates.includes(latest)) dateSelect.value = latest;
+    updated.textContent = "latest: " + (latest || "—");
+  }
+
+  function openReport(filename) {
+    const d = dateSelect.value;
+    if (!d) {
+      alert("No date available yet. Upload report_index.json and at least one report folder.");
+      return;
+    }
+    const url = `reports/${d}/${filename}`;
+    window.open(url, "_blank");
+  }
+
+  // Load date list
+  fetch("report_index.json", { cache: "no-store" })
+    .then(r => r.ok ? r.json() : null)
+    .then(j => {
+      if (!j || !Array.isArray(j.dates) || j.dates.length === 0) {
+        setDates([], null);
+        return;
+      }
+      setDates(j.dates, j.latest || j.dates[0]);
+    })
+    .catch(() => setDates([], null));
+</script>
 </body>
 </html>

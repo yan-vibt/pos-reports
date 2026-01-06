@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Category Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; background:#0b1220; color:#e9eefc; margin:0; padding:24px; }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+    .card { background:#121a2b; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:16px; }
+    .muted { color: rgba(233,238,252,.75); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { padding:8px 10px; border-bottom:1px solid rgba(255,255,255,.08); }
+    thead th { background: rgba(255,255,255,.06); text-align:left; }
+    .right { text-align:right; }
+    .red { color:#ff6b6b; font-weight:bold; }
+    a, a:hover { color:#9ec5fe; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+        <div>
+          <h2 style="margin:0;">Category Report</h2>
+          <div class="muted">Business window: 2026-01-01 06:30:00 → 2026-01-02 06:30:00 | DSN=pos</div>
+        </div>
+        <div class="muted mono">2026-01-06 20:36:24</div>
+      </div>
+      <div style="margin-top:14px;">
+        <table><thead><tr><th>Group</th><th>Amount</th><th>Amount (Taxes Included)</th><th>Category Count</th><th>Customers</th></tr></thead><tbody><tr><td>BEER</td><td><span class='right mono'>3,206.79</span></td><td><span class='right mono'>3,687.83</span></td><td><span class='right mono'>268</span></td><td><span class='right mono'>159</span></td></tr><tr><td>COOLCIDER</td><td><span class='right mono'>1,788.48</span></td><td><span class='right mono'>2,056.74</span></td><td><span class='right mono'>185</span></td><td><span class='right mono'>111</span></td></tr><tr><td>Deposit</td><td><span class='right mono'>236.20</span></td><td><span class='right mono'>236.20</span></td><td><span class='right mono'>743</span></td><td><span class='right mono'>358</span></td></tr><tr><td>Gift Card</td><td><span class='right mono'>50.00</span></td><td><span class='right mono'>50.00</span></td><td><span class='right mono'>1</span></td><td><span class='right mono'>1</span></td></tr><tr><td>RETAIL</td><td><span class='right mono'>87.47</span></td><td><span class='right mono'>95.67</span></td><td><span class='right mono'>19</span></td><td><span class='right mono'>15</span></td></tr><tr><td>Returns</td><td><span class='right mono'>-2.40</span></td><td><span class='right mono'>-2.40</span></td><td><span class='right mono'>-24</span></td><td><span class='right mono'>1</span></td></tr><tr><td>Rewards</td><td><span class='right mono'>-85.00</span></td><td><span class='right mono'>-85.00</span></td><td><span class='right mono'>-17</span></td><td><span class='right mono'>7</span></td></tr><tr><td>SPIRITS</td><td><span class='right mono'>3,417.45</span></td><td><span class='right mono'>3,930.20</span></td><td><span class='right mono'>171</span></td><td><span class='right mono'>126</span></td></tr><tr><td>WINE</td><td><span class='right mono'>526.11</span></td><td><span class='right mono'>605.06</span></td><td><span class='right mono'>23</span></td><td><span class='right mono'>18</span></td></tr><tr><td>WINE RED</td><td><span class='right mono'>1,021.11</span></td><td><span class='right mono'>1,174.31</span></td><td><span class='right mono'>54</span></td><td><span class='right mono'>40</span></td></tr><tr><td>WINE WHITE</td><td><span class='right mono'>510.71</span></td><td><span class='right mono'>587.33</span></td><td><span class='right mono'>28</span></td><td><span class='right mono'>24</span></td></tr><tr><td><span class='red'>TOTAL</span></td><td><span class='right mono red'>10,756.92</span></td><td><span class='right mono red'>12,335.94</span></td><td><span class='right mono red'>1451</span></td><td><span class='right mono red'>361</span></td></tr></tbody></table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

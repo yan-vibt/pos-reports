@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Category Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; background:#0b1220; color:#e9eefc; margin:0; padding:24px; }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+    .card { background:#121a2b; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:16px; }
+    .muted { color: rgba(233,238,252,.75); }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { padding:8px 10px; border-bottom:1px solid rgba(255,255,255,.08); }
+    thead th { background: rgba(255,255,255,.06); text-align:left; }
+    .right { text-align:right; }
+    .red { color:#ff6b6b; font-weight:bold; }
+    a, a:hover { color:#9ec5fe; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+        <div>
+          <h2 style="margin:0;">Category Report</h2>
+          <div class="muted">Business window: 2025-12-31 06:30:00 → 2026-01-01 06:30:00 | DSN=pos</div>
+        </div>
+        <div class="muted mono">2026-01-06 20:36:24</div>
+      </div>
+      <div style="margin-top:14px;">
+        <table><thead><tr><th>Group</th><th>Amount</th><th>Amount (Taxes Included)</th><th>Category Count</th><th>Customers</th></tr></thead><tbody><tr><td>BEER</td><td><span class='right mono'>8,913.56</span></td><td><span class='right mono'>10,250.69</span></td><td><span class='right mono'>643</span></td><td><span class='right mono'>401</span></td></tr><tr><td>COOLCIDER</td><td><span class='right mono'>8,079.67</span></td><td><span class='right mono'>9,291.72</span></td><td><span class='right mono'>588</span></td><td><span class='right mono'>363</span></td></tr><tr><td>Deposit</td><td><span class='right mono'>787.10</span></td><td><span class='right mono'>787.10</span></td><td><span class='right mono'>2270</span></td><td><span class='right mono'>1014</span></td></tr><tr><td>RETAIL</td><td><span class='right mono'>337.57</span></td><td><span class='right mono'>370.19</span></td><td><span class='right mono'>61</span></td><td><span class='right mono'>47</span></td></tr><tr><td>Returns</td><td><span class='right mono'>-0.20</span></td><td><span class='right mono'>-0.20</span></td><td><span class='right mono'>-2</span></td><td><span class='right mono'>1</span></td></tr><tr><td>Rewards</td><td><span class='right mono'>-475.00</span></td><td><span class='right mono'>-475.00</span></td><td><span class='right mono'>-95</span></td><td><span class='right mono'>31</span></td></tr><tr><td>SPIRITS</td><td><span class='right mono'>12,068.99</span></td><td><span class='right mono'>13,879.72</span></td><td><span class='right mono'>448</span></td><td><span class='right mono'>332</span></td></tr><tr><td>WINE</td><td><span class='right mono'>5,508.70</span></td><td><span class='right mono'>6,335.24</span></td><td><span class='right mono'>241</span></td><td><span class='right mono'>172</span></td></tr><tr><td>WINE RED</td><td><span class='right mono'>3,828.68</span></td><td><span class='right mono'>4,403.12</span></td><td><span class='right mono'>172</span></td><td><span class='right mono'>134</span></td></tr><tr><td>WINE WHITE</td><td><span class='right mono'>2,693.77</span></td><td><span class='right mono'>3,097.97</span></td><td><span class='right mono'>140</span></td><td><span class='right mono'>105</span></td></tr><tr><td><span class='red'>TOTAL</span></td><td><span class='right mono red'>41,742.84</span></td><td><span class='right mono red'>47,940.55</span></td><td><span class='right mono red'>4466</span></td><td><span class='right mono red'>1021</span></td></tr></tbody></table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

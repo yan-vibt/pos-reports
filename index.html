@@ -2,10 +2,65 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>POS Reports</title>
+  <title>Store Reports</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; background:#0b1220; color:#e9eefc; padding:40px; margin:0; }
+    a { color:#9ec5fe; font-size:18px; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    .box { background:#121a2b; padding:20px; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
+    .row { display:flex; gap:16px; flex-wrap:wrap; }
+    .card { flex:1; min-width:220px; background:rgba(255,255,255,.04); padding:16px; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
+    .muted { color:rgba(233,238,252,.75); font-size:14px; }
+    .pill { display:inline-block; padding:.2rem .55rem; border:1px solid rgba(255,255,255,.14); border-radius:999px; font-size:12px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    ul { margin:10px 0 0 0; padding-left:18px; }
+  </style>
 </head>
 <body>
-  <h2>POS Reports Test Page</h2>
-  <p>GitHub Pages is working.</p>
+  <div class="wrap">
+    <div class="box">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <div>
+          <h2 style="margin:0;">Store Reports</h2>
+          <div class="muted">Daily Summary • Category Report • Onhand</div>
+        </div>
+        <div class="pill mono" id="updated">updated: —</div>
+      </div>
+
+      <div class="row" style="margin-top:16px;">
+        <div class="card">
+          <div class="pill">Daily</div>
+          <ul>
+            <li><a href="summary_daily.html" target="_blank">Summary Report Daily</a></li>
+            <li><a href="category_report.html" target="_blank">Category Report</a></li>
+            <li><a href="onhand.html" target="_blank">Onhand Report</a></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="pill">Notes</div>
+          <div class="muted" style="margin-top:10px;">
+            Files are overwritten daily by the store sync agent.
+          </div>
+          <div class="muted" style="margin-top:10px;">
+            If a report link 404s, it hasn’t been published yet.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Optional: if you later add a latest.json file, this will show the last updated time.
+    fetch("latest.json", {cache: "no-store"})
+      .then(r => r.ok ? r.json() : null)
+      .then(j => {
+        if (!j) return;
+        document.getElementById("updated").textContent = "updated: " + (j.updated_at || "—");
+      })
+      .catch(()=>{});
+  </script>
 </body>
 </html>

@@ -5,97 +5,196 @@
   <title>Store Reports</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial, sans-serif; background:#0b1220; color:#e9eefc; padding:40px; margin:0; }
-    .wrap { max-width: 780px; margin: 0 auto; }
-    .box { background:#121a2b; padding:20px; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
-    .muted { color:rgba(233,238,252,.75); font-size:14px; }
-    .pill { display:inline-block; padding:.2rem .55rem; border:1px solid rgba(255,255,255,.14); border-radius:999px; font-size:12px; }
+    body { font-family: Arial, sans-serif; background:#0b1220; color:#e9eefc; margin:0; }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 22px; }
+    .card { background:#121a2b; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:16px; }
+    .row { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; }
+    .muted { color:rgba(233,238,252,.72); font-size:14px; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
-    .row { display:flex; gap:14px; flex-wrap:wrap; margin-top:14px; }
-    .card { flex:1; min-width:260px; background:rgba(255,255,255,.04); padding:16px; border-radius:10px; border:1px solid rgba(255,255,255,.08); }
-    label { display:block; margin-bottom:6px; }
-    select, input[type="date"] { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:#0e1626; color:#e9eefc; }
-    button { width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,.15); background:#1b4fd6; color:#fff; cursor:pointer; }
+    label { display:block; margin-bottom:6px; font-size:13px; color:rgba(233,238,252,.72); }
+    input[type="date"], select {
+      padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,.15);
+      background:#0e1626; color:#e9eefc; min-width: 220px;
+    }
+    button {
+      padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,.15);
+      background:#1b4fd6; color:#fff; cursor:pointer;
+    }
     button.secondary { background:#24314a; }
-    button:hover { filter: brightness(1.05); }
-    .top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    button:disabled { opacity:.55; cursor:not-allowed; }
+    .pill { display:inline-block; padding:.2rem .6rem; border:1px solid rgba(255,255,255,.14); border-radius:999px; font-size:12px; }
+    .top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+    .viewer { margin-top:14px; }
+    iframe {
+      width: 100%;
+      height: calc(100vh - 210px);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 12px;
+      background: #0e1626;
+    }
+    .alert {
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+    }
+    .tabs { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
   </style>
 </head>
+
 <body>
   <div class="wrap">
-    <div class="box">
+    <div class="card">
       <div class="top">
         <div>
           <h2 style="margin:0;">Store Reports</h2>
-          <div class="muted">Daily Summary • Category Report</div>
+          <div class="muted">Pick a date (calendar) → view report below (same page)</div>
         </div>
-        <div class="pill mono" id="updated">latest: —</div>
+        <div class="pill mono" id="latestPill">latest: —</div>
       </div>
 
-      <div class="row">
-        <div class="card">
-          <div class="pill">Select Date</div>
-          <div style="margin-top:10px;">
-            <label class="muted">Available dates</label>
-            <select id="dateSelect"></select>
-            <div class="muted" style="margin-top:8px;">
-              If no dates show up, upload <span class="mono">report_index.json</span> + at least one report folder.
-            </div>
+      <div class="row" style="margin-top:14px;">
+        <div>
+          <label>Choose date</label>
+          <input id="datePicker" type="date" />
+          <div class="muted" style="margin-top:6px;">
+            Only dates that exist in <span class="mono">report_index.json</span> are allowed.
           </div>
         </div>
 
-        <div class="card">
-          <div class="pill">Open Report</div>
-          <div style="margin-top:10px; display:grid; gap:10px;">
-            <button onclick="openReport('summary_daily.html')">Open Daily Summary</button>
-            <button class="secondary" onclick="openReport('category_report.html')">Open Category Report</button>
-          </div>
-          <div class="muted" style="margin-top:10px;">
-            Path format:
-            <span class="mono">reports/YYYY-MM-DD/</span>
-          </div>
+        <div style="flex:1; min-width: 260px;">
+          <label>Report</label>
+          <select id="reportSelect">
+            <option value="summary_daily.html">Daily Summary</option>
+            <option value="category_report.html">Category Report</option>
+          </select>
+        </div>
+
+        <div>
+          <button id="loadBtn">Load</button>
+        </div>
+
+        <div>
+          <button class="secondary" id="fullBtn">Open Fullscreen</button>
         </div>
       </div>
+
+      <div class="tabs">
+        <span class="pill mono" id="selectedInfo">selected: —</span>
+        <span class="pill mono" id="updatedInfo">updated: —</span>
+      </div>
+
+      <div id="msg" class="alert muted" style="display:none;"></div>
+    </div>
+
+    <div class="viewer">
+      <iframe id="viewer" src="about:blank"></iframe>
     </div>
   </div>
 
 <script>
-  const dateSelect = document.getElementById("dateSelect");
-  const updated = document.getElementById("updated");
+  const datePicker   = document.getElementById("datePicker");
+  const reportSelect = document.getElementById("reportSelect");
+  const loadBtn      = document.getElementById("loadBtn");
+  const fullBtn      = document.getElementById("fullBtn");
+  const viewer       = document.getElementById("viewer");
 
-  function setDates(dates, latest) {
-    dateSelect.innerHTML = "";
-    dates.forEach(d => {
-      const opt = document.createElement("option");
-      opt.value = d;
-      opt.textContent = d;
-      dateSelect.appendChild(opt);
-    });
-    if (latest && dates.includes(latest)) dateSelect.value = latest;
-    updated.textContent = "latest: " + (latest || "—");
+  const latestPill   = document.getElementById("latestPill");
+  const selectedInfo = document.getElementById("selectedInfo");
+  const updatedInfo  = document.getElementById("updatedInfo");
+  const msg          = document.getElementById("msg");
+
+  let availableDates = new Set();
+  let latestDate = null;
+
+  function showMsg(text) {
+    msg.style.display = "block";
+    msg.textContent = text;
+  }
+  function hideMsg() {
+    msg.style.display = "none";
+    msg.textContent = "";
   }
 
-  function openReport(filename) {
-    const d = dateSelect.value;
-    if (!d) {
-      alert("No date available yet. Upload report_index.json and at least one report folder.");
+  function setSelectedInfo() {
+    const d = datePicker.value || "—";
+    const r = reportSelect.value || "—";
+    selectedInfo.textContent = `selected: ${d} | ${r}`;
+  }
+
+  function clampDateToAvailable() {
+    // If chosen date isn't available, we prevent loading.
+    const d = datePicker.value;
+    loadBtn.disabled = !(d && availableDates.has(d));
+    fullBtn.disabled = loadBtn.disabled;
+  }
+
+  function loadReportInPage() {
+    hideMsg();
+    const d = datePicker.value;
+    if (!d) { showMsg("Pick a date first."); return; }
+    if (!availableDates.has(d)) {
+      showMsg("That date isn't available yet. (Not found in report_index.json)");
       return;
     }
-    const url = `reports/${d}/${filename}`;
+    const file = reportSelect.value;
+    const url = `reports/${d}/${file}`;
+    viewer.src = url;
+    setSelectedInfo();
+  }
+
+  function openFullscreen() {
+    const d = datePicker.value;
+    if (!d || !availableDates.has(d)) return;
+    const file = reportSelect.value;
+    const url = `reports/${d}/${file}`;
     window.open(url, "_blank");
   }
 
-  // Load date list
+  // Load index of available dates
   fetch("report_index.json", { cache: "no-store" })
     .then(r => r.ok ? r.json() : null)
     .then(j => {
       if (!j || !Array.isArray(j.dates) || j.dates.length === 0) {
-        setDates([], null);
+        showMsg("No dates found. Make sure report_index.json exists and contains a dates array.");
         return;
       }
-      setDates(j.dates, j.latest || j.dates[0]);
+
+      j.dates.forEach(d => availableDates.add(d));
+      latestDate = j.latest && availableDates.has(j.latest) ? j.latest : j.dates[0];
+
+      latestPill.textContent = "latest: " + (latestDate || "—");
+      updatedInfo.textContent = "updated: " + (j.updated_at || "—");
+
+      // Set calendar min/max and default
+      const datesSorted = [...availableDates].sort();
+      datePicker.min = datesSorted[0];
+      datePicker.max = datesSorted[datesSorted.length - 1];
+      datePicker.value = latestDate;
+
+      setSelectedInfo();
+      clampDateToAvailable();
+
+      // auto-load latest daily summary
+      viewer.src = `reports/${latestDate}/${reportSelect.value}`;
     })
-    .catch(() => setDates([], null));
+    .catch(() => showMsg("Failed to load report_index.json"));
+
+  datePicker.addEventListener("change", () => {
+    setSelectedInfo();
+    clampDateToAvailable();
+  });
+
+  reportSelect.addEventListener("change", () => {
+    setSelectedInfo();
+  });
+
+  loadBtn.addEventListener("click", loadReportInPage);
+  fullBtn.addEventListener("click", openFullscreen);
+
+  // Extra: disable load if user types a date not available
+  datePicker.addEventListener("input", clampDateToAvailable);
 </script>
 </body>
 </html>

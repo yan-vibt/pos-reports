@@ -27,7 +27,7 @@
     .viewer { margin-top:14px; }
     iframe {
       width: 100%;
-      height: calc(100vh - 210px);
+      height: calc(100vh - 230px);
       border: 1px solid rgba(255,255,255,.10);
       border-radius: 12px;
       background: #0e1626;
@@ -49,7 +49,7 @@
       <div class="top">
         <div>
           <h2 style="margin:0;">Store Reports</h2>
-          <div class="muted">Pick a date (calendar) → view report below (same page)</div>
+          <div class="muted">Pick a date → view report → export to Excel</div>
         </div>
         <div class="pill mono" id="latestPill">latest: —</div>
       </div>
@@ -58,9 +58,6 @@
         <div>
           <label>Choose date</label>
           <input id="datePicker" type="date" />
-          <div class="muted" style="margin-top:6px;">
-            Only dates that exist in <span class="mono">report_index.json</span> are allowed.
-          </div>
         </div>
 
         <div style="flex:1; min-width: 260px;">
@@ -71,13 +68,9 @@
           </select>
         </div>
 
-        <div>
-          <button id="loadBtn">Load</button>
-        </div>
-
-        <div>
-          <button class="secondary" id="fullBtn">Open Fullscreen</button>
-        </div>
+        <div><button id="loadBtn">Load</button></div>
+        <div><button class="secondary" id="fullBtn">Fullscreen</button></div>
+        <div><button class="secondary" id="xlsBtn">Download Excel</button></div>
       </div>
 
       <div class="tabs">
@@ -98,6 +91,7 @@
   const reportSelect = document.getElementById("reportSelect");
   const loadBtn      = document.getElementById("loadBtn");
   const fullBtn      = document.getElementById("fullBtn");
+  const xlsBtn       = document.getElementById("xlsBtn");
   const viewer       = document.getElementById("viewer");
 
   const latestPill   = document.getElementById("latestPill");
@@ -114,87 +108,61 @@
   }
   function hideMsg() {
     msg.style.display = "none";
-    msg.textContent = "";
   }
 
   function setSelectedInfo() {
-    const d = datePicker.value || "—";
-    const r = reportSelect.value || "—";
-    selectedInfo.textContent = `selected: ${d} | ${r}`;
+    selectedInfo.textContent = `selected: ${datePicker.value || "—"} | ${reportSelect.value}`;
   }
 
-  function clampDateToAvailable() {
-    // If chosen date isn't available, we prevent loading.
-    const d = datePicker.value;
-    loadBtn.disabled = !(d && availableDates.has(d));
-    fullBtn.disabled = loadBtn.disabled;
+  function clamp() {
+    const ok = datePicker.value && availableDates.has(datePicker.value);
+    loadBtn.disabled = !ok;
+    fullBtn.disabled = !ok;
+    xlsBtn.disabled  = !ok;
   }
 
-  function loadReportInPage() {
+  function loadReport() {
     hideMsg();
-    const d = datePicker.value;
-    if (!d) { showMsg("Pick a date first."); return; }
-    if (!availableDates.has(d)) {
-      showMsg("That date isn't available yet. (Not found in report_index.json)");
+    if (!availableDates.has(datePicker.value)) {
+      showMsg("Report not available for this date.");
       return;
     }
-    const file = reportSelect.value;
-    const url = `reports/${d}/${file}`;
-    viewer.src = url;
+    viewer.src = `reports/${datePicker.value}/${reportSelect.value}`;
     setSelectedInfo();
   }
 
-  function openFullscreen() {
-    const d = datePicker.value;
-    if (!d || !availableDates.has(d)) return;
-    const file = reportSelect.value;
-    const url = `reports/${d}/${file}`;
-    window.open(url, "_blank");
+  function fullscreen() {
+    window.open(`reports/${datePicker.value}/${reportSelect.value}`, "_blank");
   }
 
-  // Load index of available dates
+  function downloadExcel() {
+    const xls = reportSelect.value.replace(".html", ".xlsx");
+    window.open(`reports/${datePicker.value}/${xls}`, "_blank");
+  }
+
   fetch("report_index.json", { cache: "no-store" })
-    .then(r => r.ok ? r.json() : null)
+    .then(r => r.json())
     .then(j => {
-      if (!j || !Array.isArray(j.dates) || j.dates.length === 0) {
-        showMsg("No dates found. Make sure report_index.json exists and contains a dates array.");
-        return;
-      }
-
       j.dates.forEach(d => availableDates.add(d));
-      latestDate = j.latest && availableDates.has(j.latest) ? j.latest : j.dates[0];
+      latestDate = j.latest;
+      latestPill.textContent = "latest: " + latestDate;
+      updatedInfo.textContent = "updated: " + j.updated_at;
 
-      latestPill.textContent = "latest: " + (latestDate || "—");
-      updatedInfo.textContent = "updated: " + (j.updated_at || "—");
-
-      // Set calendar min/max and default
-      const datesSorted = [...availableDates].sort();
-      datePicker.min = datesSorted[0];
-      datePicker.max = datesSorted[datesSorted.length - 1];
+      const sorted = [...availableDates].sort();
+      datePicker.min = sorted[0];
+      datePicker.max = sorted[sorted.length - 1];
       datePicker.value = latestDate;
 
-      setSelectedInfo();
-      clampDateToAvailable();
-
-      // auto-load latest daily summary
+      clamp();
       viewer.src = `reports/${latestDate}/${reportSelect.value}`;
-    })
-    .catch(() => showMsg("Failed to load report_index.json"));
+      setSelectedInfo();
+    });
 
-  datePicker.addEventListener("change", () => {
-    setSelectedInfo();
-    clampDateToAvailable();
-  });
-
-  reportSelect.addEventListener("change", () => {
-    setSelectedInfo();
-  });
-
-  loadBtn.addEventListener("click", loadReportInPage);
-  fullBtn.addEventListener("click", openFullscreen);
-
-  // Extra: disable load if user types a date not available
-  datePicker.addEventListener("input", clampDateToAvailable);
+  datePicker.addEventListener("change", clamp);
+  reportSelect.addEventListener("change", setSelectedInfo);
+  loadBtn.addEventListener("click", loadReport);
+  fullBtn.addEventListener("click", fullscreen);
+  xlsBtn.addEventListener("click", downloadExcel);
 </script>
 </body>
 </html>
